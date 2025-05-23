@@ -24,3 +24,7 @@ This will:
 * Remove old database volumes (if any)
 * Rebuild and start all microservices and the PostgreSQL database
 
+Generate JWT secret key:
+```shell
+openssl rand -base64 64
+```
