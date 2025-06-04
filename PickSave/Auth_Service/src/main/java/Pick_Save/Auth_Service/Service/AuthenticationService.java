@@ -4,8 +4,11 @@ import Pick_Save.Auth_Service.DataTransferObject.LoginUserDTO;
 import Pick_Save.Auth_Service.DataTransferObject.RegisterUserDTO;
 import Pick_Save.Auth_Service.DataTransferObject.VerifyUserDTO;
 import Pick_Save.Auth_Service.Exceptions.EmailAlreadyRegisteredException;
+import Pick_Save.Auth_Service.Exceptions.UsernameAlreadyRegisteredException;
+import Pick_Save.Auth_Service.Model.Role;
 import Pick_Save.Auth_Service.Model.User;
 import Pick_Save.Auth_Service.Repository.UserRepository;
+import Pick_Save.Auth_Service.Responses.RegisterResponse;
 import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,19 +44,30 @@ public class AuthenticationService {
         this.emailService = emailService;
     }
 
-    public User signup(RegisterUserDTO input)
+    public RegisterResponse signup(RegisterUserDTO input)
     {
-        Optional<User> optionalUser = userRepository.findByEmail(input.getEmail());
-        User user = new User(input.getUsername(), input.getEmail(), passwordEncoder.encode(input.getPassword()));
+        if(!isPasswordValid(input.getPassword())){
+            throw new RuntimeException("Password must be at least 8 characters long, include one uppercase letter, one digit, and one special character.");
+        }
+        User user = new User(input.getUsername(), input.getEmail(), passwordEncoder.encode(input.getPassword()), Role.USER);
         if (userRepository.existsByEmail(user.getEmail()))
         {
             throw new EmailAlreadyRegisteredException("Email is already registered");
+        }
+        if (userRepository.existsByUsername(input.getUsername())){
+            throw new UsernameAlreadyRegisteredException("Username is already registered");
         }
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiredAt(LocalDateTime.now().plusMinutes(15));
         user.setEnabled(false);
         sendVerificationEmail(user);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return new RegisterResponse(savedUser.getUsername(), savedUser.getEmail());
+    }
+
+    public boolean isPasswordValid(String password){
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
+        return password != null && password.matches(passwordPattern);
     }
 
     public User authenticate(LoginUserDTO input)

@@ -1,6 +1,7 @@
 package Pick_Save.Auth_Service.Config;
 
 import Pick_Save.Auth_Service.Repository.UserRepository;
+import Pick_Save.Auth_Service.Service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,9 +15,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 public class ApplicationConfiguration {
     private final UserRepository userRepository;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public ApplicationConfiguration(UserRepository userRepository){
+    public ApplicationConfiguration(UserRepository userRepository, CustomUserDetailsService customUserDetailsService){
         this.userRepository = userRepository;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Bean
@@ -37,9 +40,9 @@ public class ApplicationConfiguration {
 
     @Bean
     AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-        daoAuthenticationProvider.setUserDetailsService(userDetailsService());
-        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
-        return daoAuthenticationProvider;
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(customUserDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
 }

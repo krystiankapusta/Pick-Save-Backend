@@ -15,6 +15,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import static Pick_Save.Auth_Service.Model.Permission.*;
+import static jakarta.ws.rs.HttpMethod.*;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
@@ -37,7 +40,12 @@ public class SecurityConfiguration {
         httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/verify", "/auth/resend-verification").permitAll()
+
+                        .requestMatchers(GET, "/auth/**").hasAnyAuthority(ADMIN_READ.name(), USER_READ.name())
+                        .requestMatchers(POST, "/auth/**").hasAnyAuthority(ADMIN_CREATE.name(), USER_CREATE.name())
+                        .requestMatchers(PUT, "/auth/**").hasAnyAuthority(ADMIN_UPDATE.name(), USER_UPDATE.name())
+                        .requestMatchers(DELETE, "/auth/**").hasAnyAuthority(ADMIN_DELETE.name(), USER_DELETE.name())
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

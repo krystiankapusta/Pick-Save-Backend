@@ -13,7 +13,7 @@ public class RegisterUserDTO {
     @NotBlank(message = "Email is required")
     private String email;
     @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters")
+    @Size(min = 8, max = 20, message = "Password must have 8-20 characters long")
     private String password;
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 30)

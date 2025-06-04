@@ -6,9 +6,12 @@ import Pick_Save.Auth_Service.DataTransferObject.ResendVerificationCodeDTO;
 import Pick_Save.Auth_Service.DataTransferObject.VerifyUserDTO;
 import Pick_Save.Auth_Service.Model.User;
 import Pick_Save.Auth_Service.Responses.LoginResponse;
+import Pick_Save.Auth_Service.Responses.RegisterResponse;
 import Pick_Save.Auth_Service.Service.AuthenticationService;
 import Pick_Save.Auth_Service.Service.JwtService;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,6 +25,7 @@ public class AuthenticationController {
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService) {
         this.jwtService = jwtService;
@@ -31,8 +35,8 @@ public class AuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterUserDTO registerUserDTO) {
         try {
-            User registeredUser = authenticationService.signup(registerUserDTO);
-            return ResponseEntity.ok(registeredUser);
+            RegisterResponse response = authenticationService.signup(registerUserDTO);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
