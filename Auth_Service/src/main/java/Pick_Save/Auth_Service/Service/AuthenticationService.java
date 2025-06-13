@@ -95,8 +95,9 @@ public class AuthenticationService {
         Optional<User> optionalUser = userRepository.findByEmail(input.getEmail());
         if(optionalUser.isPresent()) {
             User user = optionalUser.get();
-            if(user.getVerificationCodeExpiredAt().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Verification code has expired");
+            LocalDateTime expiry = user.getVerificationCodeExpiredAt();
+            if(expiry == null || expiry.isBefore(LocalDateTime.now())) {
+                throw new RuntimeException("Verification code has expired or not set");
             }
             if(user.getVerificationCode().equals(input.getVerificationCode())) {
                 user.setEnabled(true);
@@ -119,7 +120,7 @@ public class AuthenticationService {
                 throw new RuntimeException("Account is already verified");
             }
             user.setVerificationCode(generateVerificationCode());
-            user.setVerificationCodeExpiredAt(LocalDateTime.now().plusHours(1));
+            user.setVerificationCodeExpiredAt(LocalDateTime.now().plusMinutes(15));
             sendVerificationEmail(user);
             userRepository.save(user);
         } else {
