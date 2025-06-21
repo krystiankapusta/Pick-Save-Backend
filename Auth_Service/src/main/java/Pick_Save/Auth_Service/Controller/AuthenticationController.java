@@ -4,8 +4,11 @@ import Pick_Save.Auth_Service.DataTransferObject.LoginUserDTO;
 import Pick_Save.Auth_Service.DataTransferObject.RegisterUserDTO;
 import Pick_Save.Auth_Service.DataTransferObject.ResendVerificationCodeDTO;
 import Pick_Save.Auth_Service.DataTransferObject.VerifyUserDTO;
+import Pick_Save.Auth_Service.Exceptions.CustomAppException;
 import Pick_Save.Auth_Service.Model.User;
+import Pick_Save.Auth_Service.Responses.ErrorResponse;
 import Pick_Save.Auth_Service.Responses.LoginResponse;
+import Pick_Save.Auth_Service.Responses.MessageResponse;
 import Pick_Save.Auth_Service.Responses.RegisterResponse;
 import Pick_Save.Auth_Service.Service.AuthenticationService;
 import Pick_Save.Auth_Service.Service.JwtService;
@@ -37,8 +40,8 @@ public class AuthenticationController {
         try {
             RegisterResponse response = authenticationService.signup(registerUserDTO);
             return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (CustomAppException ex) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(ex.getCode(),ex.getMessage()));
         }
     }
 
@@ -48,9 +51,10 @@ public class AuthenticationController {
             User authenticatedUser = authenticationService.authenticate(loginUserDTO);
             String jwtToken = jwtService.generateToken(authenticatedUser);
             LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
+            logger.info("Login response -> {}", loginResponse);
             return ResponseEntity.ok(loginResponse);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (CustomAppException ex) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(ex.getCode(),ex.getMessage()));
         }
 
     }
@@ -59,9 +63,9 @@ public class AuthenticationController {
     public ResponseEntity<?> verifyUser(@Valid @RequestBody VerifyUserDTO verifyUserDTO) {
         try {
             authenticationService.verifyUser(verifyUserDTO);
-            return ResponseEntity.ok("Account verified successfully");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.ok(new MessageResponse("Account verified successfully"));
+        } catch (CustomAppException ex) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(ex.getCode(), ex.getMessage()));
         }
     }
 
@@ -69,9 +73,9 @@ public class AuthenticationController {
     public ResponseEntity<?> resendVerificationCode(@Valid @RequestBody ResendVerificationCodeDTO resendVerificationCodeDTO) {
         try {
             authenticationService.resendVerificationCode(resendVerificationCodeDTO.getEmail());
-            return ResponseEntity.ok("Verification code send");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.ok(new MessageResponse("Verification code send"));
+        } catch (CustomAppException ex) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(ex.getCode(), ex.getMessage()));
         }
     }
 }

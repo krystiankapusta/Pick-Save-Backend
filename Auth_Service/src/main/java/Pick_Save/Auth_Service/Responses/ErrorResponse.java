@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class RegisterResponse {
-    private String username;
-    private String email;
+public class ErrorResponse {
+    private String code;
+    private String message;
 }
