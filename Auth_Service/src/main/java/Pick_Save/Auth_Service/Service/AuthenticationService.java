@@ -3,11 +3,11 @@ package Pick_Save.Auth_Service.Service;
 import Pick_Save.Auth_Service.DataTransferObject.LoginUserDTO;
 import Pick_Save.Auth_Service.DataTransferObject.RegisterUserDTO;
 import Pick_Save.Auth_Service.DataTransferObject.VerifyUserDTO;
-import Pick_Save.Auth_Service.Exceptions.EmailAlreadyRegisteredException;
-import Pick_Save.Auth_Service.Exceptions.UsernameAlreadyRegisteredException;
+import Pick_Save.Auth_Service.Exceptions.CustomAppException;
 import Pick_Save.Auth_Service.Model.Role;
 import Pick_Save.Auth_Service.Model.User;
 import Pick_Save.Auth_Service.Repository.UserRepository;
+import Pick_Save.Auth_Service.Responses.ErrorCode;
 import Pick_Save.Auth_Service.Responses.RegisterResponse;
 import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
@@ -47,15 +47,15 @@ public class AuthenticationService {
     public RegisterResponse signup(RegisterUserDTO input)
     {
         if(!isPasswordValid(input.getPassword())){
-            throw new RuntimeException("Password must be at least 8 characters long, include one uppercase letter, one digit, and one special character.");
+            throw new CustomAppException(ErrorCode.PASSWORD_INVALID_FORMAT.name(), "Password must be at least 8 characters long, include one uppercase letter, one digit, and one special character.");
         }
         User user = new User(input.getUsername(), input.getEmail(), passwordEncoder.encode(input.getPassword()), Role.USER);
         if (userRepository.existsByEmail(user.getEmail()))
         {
-            throw new EmailAlreadyRegisteredException("Email is already registered");
+            throw new CustomAppException(ErrorCode.EMAIL_ALREADY_REGISTERED.name(), "Email is already registered");
         }
         if (userRepository.existsByUsername(input.getUsername())){
-            throw new UsernameAlreadyRegisteredException("Username is already registered");
+            throw new CustomAppException(ErrorCode.USERNAME_ALREADY_REGISTERED.name(),"Username is already registered");
         }
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationCodeExpiredAt(LocalDateTime.now().plusMinutes(15));
@@ -73,10 +73,10 @@ public class AuthenticationService {
     public User authenticate(LoginUserDTO input)
     {
         User user = userRepository.findByEmail(input.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new CustomAppException(ErrorCode.USER_NOT_FOUND.name(), "User not found"));
         if (!user.isEnabled())
         {
-            throw new RuntimeException("Account not verified. Please verify your account");
+            throw new CustomAppException(ErrorCode.EMAIL_NOT_VERIFIED.name(), "Account not verified. Please verify your account");
         }
         try {
             authenticationManager.authenticate(
@@ -86,7 +86,7 @@ public class AuthenticationService {
                     )
             );
         } catch (BadCredentialsException ex) {
-            throw new RuntimeException("Invalid email or password");
+            throw new CustomAppException(ErrorCode.INVALID_EMAIL_OR_PASSWORD.name(), "Invalid email or password");
         }
         return user;
     }
@@ -97,7 +97,7 @@ public class AuthenticationService {
             User user = optionalUser.get();
             LocalDateTime expiry = user.getVerificationCodeExpiredAt();
             if(expiry == null || expiry.isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Verification code has expired or not set");
+                throw new CustomAppException(ErrorCode.VERIFICATION_CODE_EXPIRED.name(), "Verification code has expired or not set");
             }
             if(user.getVerificationCode().equals(input.getVerificationCode())) {
                 user.setEnabled(true);
@@ -105,10 +105,10 @@ public class AuthenticationService {
                 user.setVerificationCodeExpiredAt(null);
                 userRepository.save(user);
             } else {
-                throw new RuntimeException("Invalid verification code");
+                throw new CustomAppException(ErrorCode.INVALID_VERIFICATION_CODE.name(), "Invalid verification code");
             }
         } else {
-            throw new RuntimeException("User not found");
+            throw new CustomAppException(ErrorCode.USER_NOT_FOUND.name(), "User not found");
         }
     }
 
@@ -117,14 +117,14 @@ public class AuthenticationService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             if (user.isEnabled()) {
-                throw new RuntimeException("Account is already verified");
+                throw new CustomAppException(ErrorCode.ACCOUNT_ALREADY_VERIFIED.name(), "Account is already verified");
             }
             user.setVerificationCode(generateVerificationCode());
             user.setVerificationCodeExpiredAt(LocalDateTime.now().plusMinutes(15));
             sendVerificationEmail(user);
             userRepository.save(user);
         } else {
-            throw new RuntimeException("User not found");
+            throw new CustomAppException(ErrorCode.USER_NOT_FOUND.name(), "User not found");
         }
     }
 

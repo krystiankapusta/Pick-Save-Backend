@@ -68,6 +68,16 @@ public class JwtService {
     private Date extractExpiration(String token){
         return extractClaim(token, Claims::getExpiration);
     }
+    public boolean tokenWillExpireSoon(String token) {
+        try {
+            Date expiration = extractExpiration(token);
+            Date bufferTime = new Date(System.currentTimeMillis() + 5 * 60 * 1000); // expires in < 5 min
+            return expiration.before(bufferTime);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     private Claims extractAllClaims(String token){
         return Jwts
                 .parserBuilder()
@@ -80,4 +90,5 @@ public class JwtService {
         byte[] keybytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keybytes);
     }
+
 }
