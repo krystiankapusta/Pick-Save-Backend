@@ -18,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private String productName;
@@ -57,5 +57,10 @@ public class Product {
         this.description = description;
         this.country = country;
         this.productionPlace = productionPlace;
+    }
+
+    public void addPrice(Price price){
+        price.setProduct(this);
+        this.prices.add(price);
     }
 }
