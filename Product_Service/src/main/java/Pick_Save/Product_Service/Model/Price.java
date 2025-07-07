@@ -16,14 +16,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class Price {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
-    @Column(nullable = false)
     private double amount;
-    @Column(nullable = false, length = 3)
+    @Column(length = 3)
     private String currency;
     private String shop;
     private String source;
