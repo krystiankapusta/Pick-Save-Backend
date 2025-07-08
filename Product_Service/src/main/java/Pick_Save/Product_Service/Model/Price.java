@@ -9,7 +9,11 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "price")
+@Table(name = "price", indexes = {
+        @Index(name = "idx_price_product_id", columnList = "product_id"),
+        @Index(name = "idx_price_shop", columnList = "shop"),
+        @Index(name = " idx_price_created", columnList = "created_at")
+})
 @Getter
 @Setter
 @AllArgsConstructor
@@ -27,12 +31,15 @@ public class Price {
     private String shop;
     private String source;
     private boolean approved;
-    private LocalDateTime created_at;
-    private LocalDateTime updated_at;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     public Price(double amount, String currency, String shop) {
         this.amount = amount;
         this.currency = currency;
         this.shop = shop;
+
     }
 }

@@ -12,7 +12,11 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "product")
+@Table(name = "product", indexes = {
+        @Index(name = "idx_product_name", columnList = "product_name"),
+        @Index(name = "idx_product_brand", columnList = "brand"),
+        @Index(name = "idx_product_created", columnList = "created_at")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,14 +24,14 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+    @Column(name = "product_name", nullable = false)
     private String productName;
     @Column(nullable = false)
     private String brand;
-    @Column(nullable = false)
+    @Column(name = "weight_value" ,nullable = false)
     private double weightValue;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "weight_unit", nullable = false)
     private WeightUnit weightUnit;
     @ManyToMany
     @JoinTable(
@@ -38,12 +42,16 @@ public class Product {
     private Set<Category> categories = new HashSet<>();
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Price> prices = new ArrayList<>();
+    @Column(name = "image_url")
     private String imageUrl;
     private String description;
     private String country;
+    @Column(name = "production_place")
     private String productionPlace;
     private boolean approved;
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     public Product(String productName, String brand, double weightValue, WeightUnit weightUnit, Set<Category> categories,

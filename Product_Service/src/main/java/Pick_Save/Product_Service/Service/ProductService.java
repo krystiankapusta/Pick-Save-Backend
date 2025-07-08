@@ -1,5 +1,6 @@
 package Pick_Save.Product_Service.Service;
 
+import Pick_Save.Product_Service.DataTransferObject.PriceDTO;
 import Pick_Save.Product_Service.DataTransferObject.ProductDTO;
 import Pick_Save.Product_Service.Model.Category;
 import Pick_Save.Product_Service.Model.Price;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -47,7 +49,16 @@ public class ProductService {
                         .orElseGet(() -> categoryRepository.save(new Category(dto.getCategoryName())))).collect(Collectors.toSet());
 
         List<Price> priceEntities = input.getPrices().stream().map(
-                dto -> new Price(dto.getAmount(), dto.getCurrency(), dto.getShop())).toList();
+                dto -> {
+                    Price price = new Price(dto.getAmount(), dto.getCurrency(), dto.getShop());
+                    price.setSource("UserInput");
+                    price.setApproved(false);
+                    price.setCreatedAt(LocalDateTime.now());
+                    price.setUpdatedAt(LocalDateTime.now());
+                    return price;
+                }).collect(Collectors.toList());
+
+
 
 
         Product product = new Product(input.getProductName(), input.getBrand(), input.getWeightValue(),
@@ -72,16 +83,38 @@ public class ProductService {
     public ProductResponse updateProduct(Long id, ProductDTO input) {
 
         Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
+        logger.info("Prices list before set update time -> {}", input.getPrices());
 
         Set<Category> categoryEntities = input.getCategories().stream().map(
                 dto -> categoryRepository.findByCategoryName(dto.getCategoryName())
                         .orElseGet(() -> categoryRepository.save(new Category(dto.getCategoryName())))).collect(Collectors.toSet());
 
+        Map<String, Price> existingPrices = product.getPrices().stream()
+                .collect(Collectors.toMap(
+                        p -> p.getShop() + "-" + p.getCurrency(),
+                        p -> p
+                ));
+        logger.info("existingPrices -> {}", existingPrices);
         product.getPrices().clear();
-        input.getPrices().forEach(dto -> {
-                    Price price = new Price(dto.getAmount(), dto.getCurrency(), dto.getShop());
-                    product.addPrice(price);
-                });
+
+        for (PriceDTO dto : input.getPrices()) {
+            String key = dto.getShop() + "-" + dto.getCurrency();
+            Price existing = existingPrices.get(key);
+            logger.info("Existing -> {}", existing);
+
+            Price newPrice = new Price(dto.getAmount(), dto.getCurrency(), dto.getShop());
+            if (existing != null) {
+                newPrice.setCreatedAt(existing.getCreatedAt());
+                newPrice.setSource(existing.getSource());
+            } else {
+                newPrice.setCreatedAt(LocalDateTime.now());
+                newPrice.setSource("UserInput");
+            }
+            newPrice.setUpdatedAt(LocalDateTime.now());
+            product.addPrice(newPrice);
+        }
+        logger.info("Prices list after set update time -> {}", input.getPrices());
+
 
         product.setProductName(input.getProductName());
         product.setBrand(input.getBrand());
@@ -114,7 +147,9 @@ public class ProductService {
                 .collect(Collectors.toSet());
 
         List<PriceResponse> priceResponses = product.getPrices().stream()
-                .map(p -> new PriceResponse(p.getAmount(), p.getCurrency(), p.getShop()))
+            .map(p -> new PriceResponse(p.getAmount(), p.getCurrency(), p.getShop(), p.isApproved(),
+                        p.getCreatedAt(),
+                        p.getUpdatedAt()))
                 .toList();
 
         return new ProductResponse(
@@ -130,7 +165,7 @@ public class ProductService {
                 product.getProductionPlace(),
                 product.isApproved(),
                 product.getCreatedAt(),
-            product.getUpdatedAt()
+                product.getUpdatedAt()
         );
     }
 }
