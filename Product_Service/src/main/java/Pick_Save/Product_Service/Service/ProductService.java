@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,6 +37,10 @@ public class ProductService {
     }
 
     public ProductResponse addProduct(ProductDTO input) {
+        if (productRepository.existsByProductNameAndBrand(input.getProductName(), input.getBrand())) {
+            throw new RuntimeException("Product already exists with the same name and brand");
+        }
+
 
         Set<Category> categoryEntities = input.getCategories().stream().map(
                 dto -> categoryRepository.findByCategoryName(dto.getCategoryName())
