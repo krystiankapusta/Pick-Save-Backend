@@ -26,8 +26,9 @@ public class Product {
     private String brand;
     @Column(nullable = false)
     private double weightValue;
-    @Column(nullable = false, length = 10)
-    private String weightUnit;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private WeightUnit weightUnit;
     @ManyToMany
     @JoinTable(
             name = "product_categories",
@@ -45,7 +46,7 @@ public class Product {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    public Product(String productName, String brand, double weightValue, String weightUnit, Set<Category> categories,
+    public Product(String productName, String brand, double weightValue, WeightUnit weightUnit, Set<Category> categories,
                    List<Price> prices, String imageUrl, String description, String country, String productionPlace) {
         this.productName = productName;
         this.brand = brand;
@@ -58,6 +59,7 @@ public class Product {
         this.country = country;
         this.productionPlace = productionPlace;
     }
+
 
     public void addPrice(Price price){
         price.setProduct(this);

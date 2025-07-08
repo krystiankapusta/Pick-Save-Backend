@@ -6,6 +6,7 @@ import Pick_Save.Product_Service.Responses.MessageResponse;
 import Pick_Save.Product_Service.Responses.ProductResponse;
 import Pick_Save.Product_Service.Service.ProductService;
 import com.netflix.discovery.converters.Auto;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class ProductController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createProduct(@RequestBody ProductDTO productDTO){
+    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDTO productDTO){
         try {
             logger.info("ProductController contain of productDTO -> {}", productDTO);
             ProductResponse response = productService.addProduct(productDTO);
@@ -38,7 +39,7 @@ public class ProductController {
         }
     }
     @PutMapping("/edit/{id}")
-    public ResponseEntity<?> editProduct(@PathVariable Long id, @RequestBody ProductDTO productDTO){
+    public ResponseEntity<?> editProduct(@Valid @PathVariable Long id, @RequestBody ProductDTO productDTO){
         try {
             logger.info("ProductController update endpoint contain productDTO -> {}", productDTO);
             ProductResponse response = productService.updateProduct(id, productDTO);

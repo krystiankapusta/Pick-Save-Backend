@@ -1,7 +1,6 @@
 package Pick_Save.Product_Service.Responses;
 
-import Pick_Save.Product_Service.DataTransferObject.CategoryDTO;
-import Pick_Save.Product_Service.DataTransferObject.PriceDTO;
+import Pick_Save.Product_Service.Model.WeightUnit;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,7 @@ public class ProductResponse {
     private String productName;
     private String brand;
     private double weightValue;
-    private String weightUnit;
+    private WeightUnit weightUnit;
     private Set<CategoryResponse> categories = new HashSet<>();
     private List<PriceResponse> prices = new ArrayList<>();
     private String imageUrl;
