@@ -10,7 +10,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "category")
+@Table(name = "category", indexes = {
+        @Index(name = "idx_category_name", columnList = "category_name")
+})
 @Getter
 @Setter
 @AllArgsConstructor
@@ -18,7 +20,7 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
+    @Column(name = "category_name", nullable = false)
     private String categoryName;
     @ManyToMany(mappedBy = "categories")
     private Set<Product> products = new HashSet<>();
