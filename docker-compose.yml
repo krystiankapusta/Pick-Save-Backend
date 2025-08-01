@@ -1,8 +1,8 @@
 services:
   eureka-server:
     build:
-      context: ./Eureka_Service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Eureka_Service/Dockerfile
     image: ${EUREKA_SERVICE_IMAGE}
     container_name: ${EUREKA_SERVICE_CONTAINER}
     ports:
@@ -21,8 +21,8 @@ services:
 
   gateway-server:
     build:
-      context: ./Gateway_Service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Gateway_Service/Dockerfile
     image: ${EUREKA_GATEWAY_IMAGE}
     container_name: ${EUREKA_GATEWAY_CONTAINER}
     ports:
@@ -84,8 +84,8 @@ services:
 
   auth-server:
     build:
-      context: ./Auth_Service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Auth_Service/Dockerfile
     image: ${AUTH_SERVICE_IMAGE}
     container_name: ${AUTH_SERVICE_CONTAINER}
     ports:
@@ -97,8 +97,8 @@ services:
       SPRING_DATASOURCE_USERNAME: ${AUTH_DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${AUTH_DB_PASSWORD}
       AUTH_SERVICE_PORT: ${AUTH_SERVICE_PORT}
-      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
-      JWT_EXPIRATION_TIME: ${JWT_EXPIRATION_TIME}
+      SECURITY_JWT_SECRET_KEY: ${SECURITY_JWT_SECRET_KEY}
+      SECURITY_JWT_EXPIRATION_TIME: ${SECURITY_JWT_EXPIRATION_TIME}
       URL_FRONTEND: ${URL_FRONTEND}
       SPRING_MAIL_HOST: ${SPRING_MAIL_HOST}
       SPRING_MAIL_PORT: ${SPRING_MAIL_PORT}
@@ -116,8 +116,8 @@ services:
 
   product-server:
     build:
-      context: ./Product_Service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: Product_Service/Dockerfile
     image: ${PRODUCT_SERVICE_IMAGE}
     container_name: ${PRODUCT_SERVICE_CONTAINER}
     ports:
@@ -129,6 +129,9 @@ services:
       SPRING_DATASOURCE_USERNAME: ${PRODUCT_DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${PRODUCT_DB_PASSWORD}
       PRODUCT_SERVICE_PORT: ${PRODUCT_SERVICE_PORT}
+      SECURITY_JWT_SECRET_KEY: ${SECURITY_JWT_SECRET_KEY}
+      SECURITY_JWT_EXPIRATION_TIME: ${SECURITY_JWT_EXPIRATION_TIME}
+      URL_FRONTEND: ${URL_FRONTEND}
     restart: always
     depends_on:
       postgres-db:

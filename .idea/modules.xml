@@ -5,6 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Auth_Service/PickSave.Auth_Service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Auth_Service/PickSave.Auth_Service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Eureka_Service/PickSave.Eureka_Service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Eureka_Service/PickSave.Eureka_Service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Gateway_Service/PickSave.Gateway_Service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Gateway_Service/PickSave.Gateway_Service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Product_Service/PickSave.Product_Service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Product_Service/PickSave.Product_Service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/security_common/PickSave.security_common.main.iml" filepath="$PROJECT_DIR$/.idea/modules/security_common/PickSave.security_common.main.iml" />
     </modules>
   </component>
 </project>

@@ -14,7 +14,7 @@ RUN ./gradlew dependencies || return 0
 COPY . /app
 
 # Build the application
-RUN ./gradlew clean build -x test
+RUN ./gradlew :Product_Service:clean :Product_Service:build -x test
 
 # Stage 2: Use a lightweight JDK image to run the app
 FROM eclipse-temurin:21-jre
@@ -22,10 +22,10 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 # Copy the jar file from the build stage
-COPY --from=build /app/build/libs/*.jar app.jar
+COPY --from=build /app/Product_Service/build/libs/*.jar app.jar
 
 # Expose the port (change if your app uses another)
-EXPOSE 8080
+EXPOSE 8092
 
 # Run the app
 CMD ["java", "-jar", "app.jar"]

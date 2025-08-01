@@ -1,1 +1,4 @@
-include 'Eureka_Service', 'Gateway_Service', 'Auth_Service'
+rootProject.name = 'PickSave'
+
+include 'Auth_Service', 'Product_Service', 'security_common', 'Eureka_Service', 'Gateway_Service'
+
