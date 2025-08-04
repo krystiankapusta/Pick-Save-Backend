@@ -56,6 +56,7 @@ public class AuthenticationController {
             User authenticatedUser = authenticationService.authenticate(loginUserDTO);
 
             Map<String, Object> extraClaims = new HashMap<>();
+            extraClaims.put("role", authenticatedUser.getRole().name());
             extraClaims.put("authorities", authenticatedUser.getRole().getPermissions().stream()
                     .map(Enum::name)
                     .collect(Collectors.toList()));
