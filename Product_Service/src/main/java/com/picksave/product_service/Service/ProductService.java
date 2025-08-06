@@ -6,6 +6,7 @@ import com.picksave.product_service.Model.Category;
 import com.picksave.product_service.Model.Price;
 import com.picksave.product_service.Model.Product;
 import com.picksave.product_service.Repository.CategoryRepository;
+import com.picksave.product_service.Repository.PriceRepository;
 import com.picksave.product_service.Repository.ProductRepository;
 import com.picksave.product_service.Responses.CategoryResponse;
 import com.picksave.product_service.Responses.PriceResponse;
@@ -30,17 +31,26 @@ public class ProductService {
     private final ProductRepository productRepository;
     @Autowired
     private final CategoryRepository categoryRepository;
+
+    @Autowired
+    private final PriceRepository priceRepository;
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, PriceRepository priceRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
-
+        this.priceRepository = priceRepository;
     }
 
     public ProductResponse addProduct(ProductDTO input) {
         if (productRepository.existsByProductNameAndBrand(input.getProductName(), input.getBrand())) {
-            throw new RuntimeException("Product already exists with the same name and brand");
+            for(PriceDTO priceDTO : input.getPrices()){
+                String shopName = priceDTO.getShop();
+                boolean existsInSameShop = priceRepository.existsByShop(shopName);
+                if (existsInSameShop){
+                    throw new RuntimeException("Product " + input.getProductName() + " by brand " + input.getBrand() + " already exists in shop " + shopName);
+                }
+            }
         }
 
 
