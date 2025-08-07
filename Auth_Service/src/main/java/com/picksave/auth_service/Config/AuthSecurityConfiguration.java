@@ -17,7 +17,7 @@ public class AuthSecurityConfiguration extends SecurityConfiguration {
     private final AuthenticationProvider authenticationProvider;
     public AuthSecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter,
                                      AuthenticationProvider authenticationProvider) {
-        super(jwtAuthenticationFilter);
+        super(null, false);
         this.authenticationProvider = authenticationProvider;
     }
 
