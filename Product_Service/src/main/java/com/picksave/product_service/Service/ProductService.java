@@ -48,7 +48,7 @@ public class ProductService {
                 String shopName = priceDTO.getShop();
                 boolean existsInSameShop = priceRepository.existsByShop(shopName);
                 if (existsInSameShop){
-                    throw new RuntimeException("Product " + input.getProductName() + " by brand " + input.getBrand() + " already exists in shop " + shopName);
+                    throw new RuntimeException("The product " + input.getProductName() + " by brand " + input.getBrand() + " already exists in shop " + shopName);
                 }
             }
         }

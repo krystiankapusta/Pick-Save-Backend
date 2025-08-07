@@ -16,7 +16,7 @@ public class ProductSecurityConfiguration extends SecurityConfiguration {
 
     public ProductSecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter,
                                         AuthenticationProvider authenticationProvider) {
-        super(jwtAuthenticationFilter);
+        super(jwtAuthenticationFilter, true);
         this.authenticationProvider = authenticationProvider;
     }
 
@@ -24,6 +24,7 @@ public class ProductSecurityConfiguration extends SecurityConfiguration {
     protected void configureAuthorization(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/products/**").hasAnyAuthority(Permission.ADMIN_READ.name(), Permission.USER_READ.name())
                         .requestMatchers(HttpMethod.POST, "/products/**").hasAnyAuthority(Permission.ADMIN_CREATE.name(), Permission.USER_CREATE.name())
                         .requestMatchers(HttpMethod.PUT, "/products/**").hasAnyAuthority(Permission.ADMIN_UPDATE.name(), Permission.USER_UPDATE.name())

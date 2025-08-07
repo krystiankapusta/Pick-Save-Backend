@@ -14,7 +14,7 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductResponse {
+public class   ProductResponse {
     private String productName;
     private String brand;
     private double weightValue;
