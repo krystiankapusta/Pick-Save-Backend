@@ -89,4 +89,16 @@ public class ProductController {
             return ResponseEntity.badRequest().body(new MessageResponse("Product delete failed"));
         }
     }
+
+    @PreAuthorize("hasAuthority('ADMIN_UPDATE')")
+    @PutMapping("/verify/{id}")
+    public ResponseEntity<?> verifyProduct(@PathVariable Long id, Authentication auth) {
+        try {
+            logger.info("Product verification status updated by: {}", auth.getAuthorities());
+            productService.verifyProduct(id);
+            return ResponseEntity.ok(new MessageResponse("Product verify successful"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Product verification failed"));
+        }
+    }
 }
