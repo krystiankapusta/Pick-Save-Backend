@@ -15,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class   ProductResponse {
+    private Long Id;
     private String productName;
     private String brand;
     private double weightValue;

@@ -120,6 +120,7 @@ public class ProductService {
                 newPrice.setCreatedAt(LocalDateTime.now());
                 newPrice.setSource("UserInput");
             }
+            newPrice.setApproved(false);
             newPrice.setUpdatedAt(LocalDateTime.now());
             product.addPrice(newPrice);
         }
@@ -135,6 +136,7 @@ public class ProductService {
         product.setDescription(input.getDescription());
         product.setCountry(input.getCountry());
         product.setProductionPlace(input.getProductionPlace());
+        product.setApproved(false);
         product.setUpdatedAt(LocalDateTime.now());
 
         Product savedProduct = productRepository.save(product);
@@ -151,6 +153,17 @@ public class ProductService {
         Product product = productRepository.findById(id).orElseThrow( () -> new RuntimeException("Product not found"));
         productRepository.deleteById(id);
     }
+
+    public void verifyProduct(Long id) {
+        Product product = productRepository.findById(id).orElseThrow( () -> new RuntimeException("Product not found"));
+        product.setApproved(true);
+
+        for(Price price: product.getPrices()){
+            price.setApproved(true);
+            price.setUpdatedAt(LocalDateTime.now());
+        }
+        productRepository.save(product);
+    }
     private ProductResponse mapToResponse(Product product) {
         Set<CategoryResponse> categoryResponses = product.getCategories().stream()
                 .map(cat -> new CategoryResponse(cat.getCategoryName()))
@@ -163,6 +176,7 @@ public class ProductService {
                 .toList();
 
         return new ProductResponse(
+                product.getId(),
                 product.getProductName(),
                 product.getBrand(),
                 product.getWeightValue(),

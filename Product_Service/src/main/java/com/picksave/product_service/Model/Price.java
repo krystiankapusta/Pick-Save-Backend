@@ -40,6 +40,5 @@ public class Price {
         this.amount = amount;
         this.currency = currency;
         this.shop = shop;
-
     }
 }
