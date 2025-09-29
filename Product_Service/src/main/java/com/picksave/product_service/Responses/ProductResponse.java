@@ -14,11 +14,11 @@ import java.util.Set;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class   ProductResponse {
+public class ProductResponse {
     private Long Id;
     private String productName;
     private String brand;
-    private double weightValue;
+    private Double weightValue;
     private WeightUnit weightUnit;
     private Set<CategoryResponse> categories = new HashSet<>();
     private List<PriceResponse> prices = new ArrayList<>();

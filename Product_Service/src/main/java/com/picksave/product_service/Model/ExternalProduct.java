@@ -20,13 +20,12 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Product {
+public class ExternalProduct {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "product_name", nullable = false)
     private String productName;
-    @Column(nullable = false)
     private String brand;
     @Column(name = "weight_value")
     private Double weightValue;
@@ -39,9 +38,9 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
-    private Set<Category> categories = new HashSet<>();
+    private Set<ExternalCategory> categories = new HashSet<>();
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Price> prices = new ArrayList<>();
+    private List<ExternalPrice> prices = new ArrayList<>();
     @Column(name = "image_url")
     private String imageUrl;
     private String description;
@@ -56,9 +55,11 @@ public class Product {
     @Column(name = "product_source", nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductSource source;
+    @Column(name = "barcode", unique = true, nullable = false)
+    private String barcode;
 
-    public Product(String productName, String brand, Double weightValue, WeightUnit weightUnit, Set<Category> categories,
-                   List<Price> prices, String imageUrl, String description, String country, String productionPlace) {
+    public ExternalProduct(String productName, String brand, Double weightValue, WeightUnit weightUnit, Set<ExternalCategory> categories,
+                           List<ExternalPrice> prices, String imageUrl, String description, String country, String productionPlace) {
         this.productName = productName;
         this.brand = brand;
         this.weightValue = weightValue;
@@ -72,8 +73,8 @@ public class Product {
     }
 
 
-    public void addPrice(Price price){
-        price.setProduct(this);
-        this.prices.add(price);
+    public void addPrice(ExternalPrice externalPrice){
+        externalPrice.setExternalProduct(this); // I am not sure that this will be work
+        this.prices.add(externalPrice);
     }
 }

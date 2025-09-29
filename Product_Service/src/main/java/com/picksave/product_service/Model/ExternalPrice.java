@@ -18,13 +18,13 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Price {
+public class ExternalPrice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    private ExternalProduct product;
     private double amount;
     @Column(length = 3)
     private String currency;
@@ -38,9 +38,13 @@ public class Price {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Price(double amount, String currency, String shop) {
+    public ExternalPrice(double amount, String currency, String shop) {
         this.amount = amount;
         this.currency = currency;
         this.shop = shop;
+    }
+
+    public void setExternalProduct(ExternalProduct product) {
+        this.product = product;
     }
 }

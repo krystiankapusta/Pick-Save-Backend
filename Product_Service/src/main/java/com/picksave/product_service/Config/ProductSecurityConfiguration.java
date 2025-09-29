@@ -29,6 +29,7 @@ public class ProductSecurityConfiguration extends SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/products/**").hasAnyAuthority(Permission.ADMIN_CREATE.name(), Permission.USER_CREATE.name())
                         .requestMatchers(HttpMethod.PUT, "/products/**").hasAnyAuthority(Permission.ADMIN_UPDATE.name(), Permission.USER_UPDATE.name())
                         .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority(Permission.ADMIN_DELETE.name())
+                        .requestMatchers(HttpMethod.POST, "/external-products/**").hasAnyAuthority(Permission.ADMIN_CREATE.name())
                         .anyRequest().authenticated()
                 );
     }
