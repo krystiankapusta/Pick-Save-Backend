@@ -1,7 +1,7 @@
 package com.picksave.security_common.Config;
 
 
-import com.picksave.security_common.Service.AuthUserDetailsService;
+import com.picksave.security_common.Model.AuthenticatedUser;
 import com.picksave.security_common.Service.JwtService;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -31,16 +30,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtService jwtService;
-    private final AuthUserDetailsService userDetailsService;
 
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
     public JwtAuthenticationFilter(@Qualifier("handlerExceptionResolver")
             HandlerExceptionResolver handlerExceptionResolver,
-            JwtService jwtService, AuthUserDetailsService userDetailsService
+            JwtService jwtService
     ) {
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.jwtService = jwtService;
-        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -70,20 +67,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     logger.info("JWT is valid. Setting authentication context.");
 
                     Claims claims = jwtService.extractAllClaims(jwt);
+                    String role = claims.get("role", String.class);
                     List<String> authoritiesFromToken = claims.get("authorities", List.class);
                     List<SimpleGrantedAuthority> authorities = authoritiesFromToken.stream()
                             .map(SimpleGrantedAuthority::new)
                             .toList();
                     logger.info("Authorities from token: {}", authorities);
 
+                    AuthenticatedUser principal = new AuthenticatedUser(userEmail, role);
 
-                    UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                            userEmail,
-                            "",
-                            authorities
-                    );
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
+                            principal,
                             null,
                             authorities
                     );

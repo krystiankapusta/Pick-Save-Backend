@@ -15,23 +15,23 @@ import java.util.Set;
 @Getter
 @Setter
 @AllArgsConstructor
-public class Category {
+public class ExternalCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "category_name", nullable = false, unique = true)
+    @Column(name = "category_name", unique = true)
     private String categoryName;
     @ManyToMany(mappedBy = "categories")
-    private Set<Product> products = new HashSet<>();
+    private Set<ExternalProduct> products = new HashSet<>();
 
-    public Category(String categoryName, Set<Product> products) {
+    public ExternalCategory(String categoryName, Set<ExternalProduct> products) {
         this.categoryName = categoryName;
         this.products = products;
     }
 
-    public Category(String categoryName) {
+    public ExternalCategory(String categoryName) {
         this.categoryName = categoryName;
     }
-    public Category(){};
+    public ExternalCategory(){};
 
 }

@@ -4,6 +4,7 @@ import com.picksave.product_service.DataTransferObject.ProductDTO;
 import com.picksave.product_service.Responses.MessageResponse;
 import com.picksave.product_service.Responses.ProductResponse;
 import com.picksave.product_service.Service.ProductService;
+import com.picksave.security_common.Model.AuthenticatedUser;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,8 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 import java.util.List;
 
 
@@ -29,12 +28,14 @@ public class ProductController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDTO productDTO, Principal principal){
+    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDTO productDTO, Authentication authentication) {
+        AuthenticatedUser user = (AuthenticatedUser) authentication.getPrincipal();
         try {
             logger.info("=== ProductController method called ===");
-            logger.info("Authenticated principal: {}", principal);
             logger.info("ProductController contain of productDTO -> {}", productDTO);
-            ProductResponse response = productService.addProduct(productDTO);
+            String role = user.getRole();
+            logger.info("Role: {}", role);
+            ProductResponse response = productService.addProduct(productDTO, role);
             logger.info("Returning response: {}", response);
             return ResponseEntity.ok(response);
 

@@ -5,12 +5,14 @@ import com.picksave.product_service.DataTransferObject.ProductDTO;
 import com.picksave.product_service.Model.Category;
 import com.picksave.product_service.Model.Price;
 import com.picksave.product_service.Model.Product;
+import com.picksave.product_service.Model.ProductSource;
 import com.picksave.product_service.Repository.CategoryRepository;
 import com.picksave.product_service.Repository.PriceRepository;
 import com.picksave.product_service.Repository.ProductRepository;
 import com.picksave.product_service.Responses.CategoryResponse;
 import com.picksave.product_service.Responses.PriceResponse;
 import com.picksave.product_service.Responses.ProductResponse;
+import com.picksave.security_common.Model.Role;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +44,9 @@ public class ProductService {
         this.priceRepository = priceRepository;
     }
 
-    public ProductResponse addProduct(ProductDTO input) {
+    public ProductResponse addProduct(ProductDTO input, String role) {
+        Role userRole = Role.valueOf(role);
+
         if (productRepository.existsByProductNameAndBrand(input.getProductName(), input.getBrand())) {
             for(PriceDTO priceDTO : input.getPrices()){
                 String shopName = priceDTO.getShop();
@@ -53,7 +57,6 @@ public class ProductService {
             }
         }
 
-
         Set<Category> categoryEntities = input.getCategories().stream().map(
                 dto -> categoryRepository.findByCategoryName(dto.getCategoryName())
                         .orElseGet(() -> categoryRepository.save(new Category(dto.getCategoryName())))).collect(Collectors.toSet());
@@ -61,24 +64,29 @@ public class ProductService {
         List<Price> priceEntities = input.getPrices().stream().map(
                 dto -> {
                     Price price = new Price(dto.getAmount(), dto.getCurrency(), dto.getShop());
-                    price.setSource("UserInput");
+                    switch (userRole) {
+                        case ADMIN -> price.setSource(ProductSource.ADMIN_INPUT);
+                        case USER  -> price.setSource(ProductSource.USER_INPUT);
+                        default    -> price.setSource(ProductSource.OPEN_FOOD_FACTS);
+                    }
                     price.setApproved(false);
                     price.setCreatedAt(LocalDateTime.now());
                     price.setUpdatedAt(LocalDateTime.now());
                     return price;
                 }).collect(Collectors.toList());
 
-
-
-
         Product product = new Product(input.getProductName(), input.getBrand(), input.getWeightValue(),
                 input.getWeightUnit(), categoryEntities, priceEntities, input.getImageUrl(),
                 input.getDescription(), input.getCountry(), input.getProductionPlace());
 
+        switch (userRole) {
+            case ADMIN -> product.setSource(ProductSource.ADMIN_INPUT);
+            case USER  -> product.setSource(ProductSource.USER_INPUT);
+            default    -> product.setSource(ProductSource.OPEN_FOOD_FACTS);
+        }
         product.setApproved(false);
         product.setCreatedAt(LocalDateTime.now());
         product.setUpdatedAt(LocalDateTime.now());
-
         priceEntities.forEach(price -> price.setProduct(product));
         Product savedProduct = productRepository.save(product);
 
@@ -118,7 +126,7 @@ public class ProductService {
                 newPrice.setSource(existing.getSource());
             } else {
                 newPrice.setCreatedAt(LocalDateTime.now());
-                newPrice.setSource("UserInput");
+                newPrice.setSource(ProductSource.USER_INPUT);
             }
             newPrice.setApproved(false);
             newPrice.setUpdatedAt(LocalDateTime.now());

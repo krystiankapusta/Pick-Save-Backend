@@ -9,7 +9,6 @@ import com.picksave.auth_service.Model.User;
 import com.picksave.auth_service.Repository.UserRepository;
 import com.picksave.auth_service.Responses.ErrorCode;
 import com.picksave.auth_service.Responses.RegisterResponse;
-import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -146,7 +145,7 @@ public class AuthenticationService {
 
         try {
             emailService.sendVerificationEmail(user.getEmail(), subject, htmlMessage);
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
