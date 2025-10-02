@@ -45,13 +45,16 @@ public class ProductController {
         }
     }
     @PutMapping("/edit/{id}")
-    public ResponseEntity<?> editProduct(@Valid @PathVariable Long id, @RequestBody ProductDTO productDTO){
+    public ResponseEntity<?> editProduct(@Valid @PathVariable Long id, @RequestBody ProductDTO productDTO, Authentication authentication){
+        AuthenticatedUser user = (AuthenticatedUser) authentication.getPrincipal();
         try {
+            String role = user.getRole();
             logger.info("ProductController update endpoint contain productDTO -> {}", productDTO);
-            ProductResponse response = productService.updateProduct(id, productDTO);
+            ProductResponse response = productService.updateProduct(id, productDTO, role);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
+            logger.error("Error updating product", e);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

@@ -10,25 +10,40 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
 public class OpenFoodFactsMapper {
 
+    private static final List<String> preferredLanguages = Arrays.asList("pl", "en");
     private static final Logger logger = LoggerFactory.getLogger(OpenFoodFactsMapper.class);
 
     public ExternalProduct toEntity(OpenFoodFactsProductResponse response) {
         var apiProduct = response.getProduct();
 
         ExternalProduct product = new ExternalProduct();
-        product.setProductName(apiProduct.getProduct_name());
+        product.setProductName(extractPreferredName(response));
         product.setBrand(apiProduct.getBrands());
         product.setImageUrl(apiProduct.getImage_url());
         product.setDescription(apiProduct.getGeneric_name());
-        product.setCountry(apiProduct.getCountries().contains(":")
-                ? apiProduct.getCountries().substring(apiProduct.getCountries().indexOf(":") + 1)
-                : apiProduct.getCountries());
+
+        List<String> countriesWithPrefix = Arrays.stream(apiProduct.getCountries().split(","))
+                .map(String::trim)
+                .toList();
+
+        List<String> countries = countriesWithPrefix.stream()
+                .map(country -> country.contains(":")
+                        ? country.substring(country.indexOf(":") + 1)
+                        : country)
+                .map(String::trim)
+                .map(String::toLowerCase)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+        product.setCountries(countries);
         product.setSource(ProductSource.OPEN_FOOD_FACTS);
         product.setCreatedAt(LocalDateTime.now());
         product.setUpdatedAt(LocalDateTime.now());
@@ -70,6 +85,16 @@ public class OpenFoodFactsMapper {
         product.setCategories(categories);
 
         return product;
+    }
+
+    private String extractPreferredName(OpenFoodFactsProductResponse response){
+        for(String prefix : preferredLanguages) {
+            String name = response.getProduct().getLocalizedName(prefix);
+            if(name != null && !name.isBlank()){
+                return name;
+            }
+        }
+        return null;
     }
 }
 

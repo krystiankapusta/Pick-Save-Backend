@@ -44,7 +44,13 @@ public class ExternalProduct {
     @Column(name = "image_url")
     private String imageUrl;
     private String description;
-    private String country;
+    @ElementCollection
+    @CollectionTable(
+            name = "product_countries",
+            joinColumns = @JoinColumn(name = "product_id")
+    )
+    @Column(name = "country")
+    private List<String> countries = new ArrayList<>();
     @Column(name = "production_place")
     private String productionPlace;
     private boolean approved;
@@ -55,11 +61,11 @@ public class ExternalProduct {
     @Column(name = "product_source", nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductSource source;
-    @Column(name = "barcode", unique = true, nullable = false)
+    @Column(name = "barcode", unique = true)
     private String barcode;
 
     public ExternalProduct(String productName, String brand, Double weightValue, WeightUnit weightUnit, Set<ExternalCategory> categories,
-                           List<ExternalPrice> prices, String imageUrl, String description, String country, String productionPlace) {
+                           List<ExternalPrice> prices, String imageUrl, String description, List<String> countries, String productionPlace) {
         this.productName = productName;
         this.brand = brand;
         this.weightValue = weightValue;
@@ -68,13 +74,13 @@ public class ExternalProduct {
         this.prices = prices;
         this.imageUrl = imageUrl;
         this.description = description;
-        this.country = country;
+        this.countries = countries;
         this.productionPlace = productionPlace;
     }
 
 
     public void addPrice(ExternalPrice externalPrice){
-        externalPrice.setExternalProduct(this); // I am not sure that this will be work
+        externalPrice.setExternalProduct(this);
         this.prices.add(externalPrice);
     }
 }

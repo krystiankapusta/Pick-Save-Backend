@@ -45,7 +45,13 @@ public class Product {
     @Column(name = "image_url")
     private String imageUrl;
     private String description;
-    private String country;
+    @ElementCollection
+    @CollectionTable(
+            name = "product_countries",
+            joinColumns = @JoinColumn(name = "product_id")
+    )
+    @Column(name = "country")
+    private List<String> countries = new ArrayList<>();
     @Column(name = "production_place")
     private String productionPlace;
     private boolean approved;
@@ -56,9 +62,11 @@ public class Product {
     @Column(name = "product_source", nullable = false)
     @Enumerated(EnumType.STRING)
     private ProductSource source;
+    @Column(name = "barcode", unique = true)
+    private String barcode;
 
     public Product(String productName, String brand, Double weightValue, WeightUnit weightUnit, Set<Category> categories,
-                   List<Price> prices, String imageUrl, String description, String country, String productionPlace) {
+                   List<Price> prices, String imageUrl, String description, List<String> countries, String productionPlace) {
         this.productName = productName;
         this.brand = brand;
         this.weightValue = weightValue;
@@ -67,10 +75,9 @@ public class Product {
         this.prices = prices;
         this.imageUrl = imageUrl;
         this.description = description;
-        this.country = country;
+        this.countries = countries;
         this.productionPlace = productionPlace;
     }
-
 
     public void addPrice(Price price){
         price.setProduct(this);
