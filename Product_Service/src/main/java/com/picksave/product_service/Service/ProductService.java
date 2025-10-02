@@ -20,9 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,9 +73,14 @@ public class ProductService {
                     return price;
                 }).collect(Collectors.toList());
 
+        List<String> countries = input.getCountries().stream()
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+
         Product product = new Product(input.getProductName(), input.getBrand(), input.getWeightValue(),
                 input.getWeightUnit(), categoryEntities, priceEntities, input.getImageUrl(),
-                input.getDescription(), input.getCountry(), input.getProductionPlace());
+                input.getDescription(), countries, input.getProductionPlace());
 
         switch (userRole) {
             case ADMIN -> product.setSource(ProductSource.ADMIN_INPUT);
@@ -88,6 +91,7 @@ public class ProductService {
         product.setCreatedAt(LocalDateTime.now());
         product.setUpdatedAt(LocalDateTime.now());
         priceEntities.forEach(price -> price.setProduct(product));
+        product.setBarcode(null);
         Product savedProduct = productRepository.save(product);
 
         return mapToResponse(savedProduct);
@@ -98,7 +102,8 @@ public class ProductService {
         return productRepository.findAll().stream().map(this::mapToResponse).toList();
     }
 
-    public ProductResponse updateProduct(Long id, ProductDTO input) {
+    public ProductResponse updateProduct(Long id, ProductDTO input, String role) {
+        Role userRole = Role.valueOf(role);
 
         Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
         logger.info("Prices list before set update time -> {}", input.getPrices());
@@ -115,6 +120,7 @@ public class ProductService {
         logger.info("existingPrices -> {}", existingPrices);
         product.getPrices().clear();
 
+
         for (PriceDTO dto : input.getPrices()) {
             String key = dto.getShop() + "-" + dto.getCurrency();
             Price existing = existingPrices.get(key);
@@ -126,14 +132,17 @@ public class ProductService {
                 newPrice.setSource(existing.getSource());
             } else {
                 newPrice.setCreatedAt(LocalDateTime.now());
-                newPrice.setSource(ProductSource.USER_INPUT);
+                switch (userRole) {
+                    case ADMIN -> newPrice.setSource(ProductSource.ADMIN_INPUT);
+                    case USER  -> newPrice.setSource(ProductSource.USER_INPUT);
+                    default    -> newPrice.setSource(ProductSource.OPEN_FOOD_FACTS);
+                }
             }
             newPrice.setApproved(false);
             newPrice.setUpdatedAt(LocalDateTime.now());
             product.addPrice(newPrice);
         }
         logger.info("Prices list after set update time -> {}", input.getPrices());
-
 
         product.setProductName(input.getProductName());
         product.setBrand(input.getBrand());
@@ -142,8 +151,17 @@ public class ProductService {
         product.setCategories(categoryEntities);
         product.setImageUrl(input.getImageUrl());
         product.setDescription(input.getDescription());
-        product.setCountry(input.getCountry());
+        List<String> countries = input.getCountries().stream()
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+        product.setCountries(countries);
         product.setProductionPlace(input.getProductionPlace());
+        switch (userRole) {
+            case ADMIN -> product.setSource(ProductSource.ADMIN_INPUT);
+            case USER  -> product.setSource(ProductSource.USER_INPUT);
+            default    -> product.setSource(ProductSource.OPEN_FOOD_FACTS);
+        }
         product.setApproved(false);
         product.setUpdatedAt(LocalDateTime.now());
 
@@ -193,7 +211,7 @@ public class ProductService {
                 priceResponses,
                 product.getImageUrl(),
                 product.getDescription(),
-                product.getCountry(),
+                product.getCountries(),
                 product.getProductionPlace(),
                 product.isApproved(),
                 product.getCreatedAt(),

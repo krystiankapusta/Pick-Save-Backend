@@ -24,7 +24,7 @@ public class ProductResponse {
     private List<PriceResponse> prices = new ArrayList<>();
     private String imageUrl;
     private String description;
-    private String country;
+    private List<String> countries;
     private String productionPlace;
     private boolean approved;
     private LocalDateTime createdAt;

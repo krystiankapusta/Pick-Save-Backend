@@ -32,6 +32,6 @@ public class ProductDTO {
     private String imageUrl;
     @Size(max = 255, message = "Description must be less than 255 characters")
     private String description;
-    private String country;
+    private List<String> countries = new ArrayList<>();
     private String productionPlace;
 }

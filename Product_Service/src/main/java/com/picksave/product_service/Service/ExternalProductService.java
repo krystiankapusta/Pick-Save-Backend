@@ -45,11 +45,23 @@ public class ExternalProductService {
 
         ExternalProduct newProduct = mapper.toEntity(response);
         newProduct.setBarcode(barcode);
-        String country = newProduct.getCountry();
+        List<String> countries = newProduct.getCountries().stream()
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(String::toLowerCase)
+                .toList();
+
+        boolean sellInPoland = false;
+        for(String country: countries) {
+            if(country.equals("poland") || country.equals("polska")){
+                sellInPoland = true;
+                break;
+            }
+        }
 
         if ((newProduct.getProductName() == null || newProduct.getProductName().isBlank()
                 || newProduct.getBrand() == null || newProduct.getBrand().isBlank() )
-                || !(country.toLowerCase().contains("poland") || country.toLowerCase().contains("polska"))){
+                || !sellInPoland){
             logger.warn("Skipping product {} because it has no name, brand or it hasn't sell in Poland", barcode);
             return null;
         }
@@ -72,8 +84,8 @@ public class ExternalProductService {
         if (newProduct.getImageUrl() != null) {
             existing.setImageUrl(newProduct.getImageUrl());
         }
-        if (newProduct.getCountry() != null) {
-            existing.setCountry(newProduct.getCountry());
+        if (newProduct.getCountries() != null) {
+            existing.setCountries(newProduct.getCountries());
         }
 
         Set<ExternalCategory> managedCategories = attachCategories(newProduct);
@@ -187,7 +199,7 @@ public class ExternalProductService {
                 priceResponses,
                 product.getImageUrl(),
                 product.getDescription(),
-                product.getCountry(),
+                product.getCountries(),
                 product.getProductionPlace(),
                 product.isApproved(),
                 product.getCreatedAt(),

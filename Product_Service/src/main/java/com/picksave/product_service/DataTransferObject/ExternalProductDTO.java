@@ -3,7 +3,6 @@ package com.picksave.product_service.DataTransferObject;
 import com.picksave.product_service.Model.WeightUnit;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import java.util.ArrayList;
@@ -24,6 +23,6 @@ public class ExternalProductDTO {
     private String imageUrl;
     @Size(max = 255, message = "Description must be less than 255 characters")
     private String description;
-    private String country;
+    private List<String> countries = new ArrayList<>();
     private String productionPlace;
 }
