@@ -16,6 +16,7 @@ public enum Permission {
     USER_DELETE("user:delete");
 
 
-    @Getter
-    private final String Persmission;
+    private final String permission;
+    public String getPermission() { return permission; }
+
 }

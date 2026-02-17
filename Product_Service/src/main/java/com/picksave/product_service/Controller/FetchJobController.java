@@ -1,4 +1,4 @@
-package com.picksave.product_service.Controler;
+package com.picksave.product_service.Controller;
 
 import com.picksave.product_service.Model.FetchJob;
 import com.picksave.product_service.Service.FetchJobService;

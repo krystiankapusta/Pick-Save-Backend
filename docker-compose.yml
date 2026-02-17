@@ -1,8 +1,8 @@
 services:
-  eureka-server:
+  eureka-service:
     build:
       context: .
-      dockerfile: Eureka_Service/Dockerfile
+      dockerfile: eureka_service/Dockerfile
     image: ${EUREKA_SERVICE_IMAGE}
     container_name: ${EUREKA_SERVICE_CONTAINER}
     ports:
@@ -19,10 +19,10 @@ services:
     networks:
       - microservices-network
 
-  gateway-server:
+  gateway-service:
     build:
       context: .
-      dockerfile: Gateway_Service/Dockerfile
+      dockerfile: gateway_service/Dockerfile
     image: ${EUREKA_GATEWAY_IMAGE}
     container_name: ${EUREKA_GATEWAY_CONTAINER}
     ports:
@@ -32,7 +32,7 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: ${EUREKA_URL}
     restart: always
     depends_on:
-      eureka-server:
+      eureka-service:
         condition: service_healthy
     networks:
       - microservices-network
@@ -53,7 +53,7 @@ services:
     ports:
       - "${DB_PORT}:${DB_MAPPED_PORT}"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql
       - ./Database/schema.sh:/docker-entrypoint-initdb.d/schema.sh
       - ./Database/check-db.sh:/docker-entrypoint-initdb.d/check-db.sh
     healthcheck:
@@ -82,10 +82,10 @@ services:
     networks:
       - microservices-network
 
-  auth-server:
+  auth-service:
     build:
       context: .
-      dockerfile: Auth_Service/Dockerfile
+      dockerfile: auth_service/Dockerfile
     image: ${AUTH_SERVICE_IMAGE}
     container_name: ${AUTH_SERVICE_CONTAINER}
     ports:
@@ -114,10 +114,10 @@ services:
     networks:
       - microservices-network
 
-  product-server:
+  product-service:
     build:
       context: .
-      dockerfile: Product_Service/Dockerfile
+      dockerfile: product_service/Dockerfile
     image: ${PRODUCT_SERVICE_IMAGE}
     container_name: ${PRODUCT_SERVICE_CONTAINER}
     ports:

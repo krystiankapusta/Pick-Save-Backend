@@ -10,7 +10,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 @EnableConfigurationProperties(JwtProperties.class)
 @SpringBootApplication(scanBasePackages = {
 		"com.picksave.auth_service",
-		"com.picksave.security_common"
+		"com.picksave.security_common.Service"
 })
 public class AuthServiceApplication {
 

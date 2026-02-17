@@ -14,7 +14,7 @@ RUN ./gradlew dependencies || return 0
 COPY . /app
 
 # Build the application
-RUN ./gradlew :Eureka_Service:clean :Eureka_Service:build -x test
+RUN ./gradlew :eureka_service:clean :eureka_service:build -x test
 
 # Stage 2: Use a lightweight JDK image to run the app
 FROM eclipse-temurin:21-jre
@@ -22,7 +22,7 @@ FROM eclipse-temurin:21-jre
 WORKDIR /app
 
 # Copy the jar file from the build stage
-COPY --from=build /app/Eureka_Service/build/libs/*.jar app.jar
+COPY --from=build /app/eureka_service/build/libs/*.jar app.jar
 
 # Expose the port (change if your app uses another)
 EXPOSE 8761
