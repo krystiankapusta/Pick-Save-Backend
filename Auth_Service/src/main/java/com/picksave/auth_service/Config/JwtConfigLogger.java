@@ -13,9 +13,4 @@ public class JwtConfigLogger {
         this.jwtProperties = jwtProperties;
     }
 
-    @PostConstruct
-    public void logJwtProperties() {
-        System.out.println("JWT Secret Key: " + jwtProperties.getSecretKey());
-        System.out.println("JWT Expiration Time: " + jwtProperties.getExpirationTime());
-    }
 }

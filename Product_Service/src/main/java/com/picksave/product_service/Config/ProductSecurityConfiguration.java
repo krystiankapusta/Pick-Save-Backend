@@ -25,11 +25,12 @@ public class ProductSecurityConfiguration extends SecurityConfiguration {
         httpSecurity
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/products/**").hasAnyAuthority(Permission.ADMIN_READ.name(), Permission.USER_READ.name())
-                        .requestMatchers(HttpMethod.POST, "/products/**").hasAnyAuthority(Permission.ADMIN_CREATE.name(), Permission.USER_CREATE.name())
-                        .requestMatchers(HttpMethod.PUT, "/products/**").hasAnyAuthority(Permission.ADMIN_UPDATE.name(), Permission.USER_UPDATE.name())
-                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority(Permission.ADMIN_DELETE.name())
-                        .requestMatchers(HttpMethod.POST, "/external-products/**").hasAnyAuthority(Permission.ADMIN_CREATE.name())
+                        .requestMatchers(HttpMethod.GET, "/products/**").hasAnyAuthority(Permission.ADMIN_READ.getPermission(), Permission.USER_READ.getPermission())
+                        .requestMatchers(HttpMethod.POST, "/products/**").hasAnyAuthority(Permission.ADMIN_CREATE.getPermission(), Permission.USER_CREATE.getPermission())
+                        .requestMatchers(HttpMethod.PUT, "/products/**").hasAnyAuthority(Permission.ADMIN_UPDATE.getPermission(), Permission.USER_UPDATE.getPermission())
+                        .requestMatchers(HttpMethod.DELETE, "/products/**").hasAnyAuthority(Permission.ADMIN_DELETE.getPermission())
+                        .requestMatchers(HttpMethod.POST, "/external-products/**").hasAnyAuthority(Permission.ADMIN_CREATE.getPermission())
+                        .requestMatchers(HttpMethod.GET, "/search/**").hasAnyAuthority(Permission.ADMIN_READ.getPermission(), Permission.USER_READ.getPermission())
                         .anyRequest().authenticated()
                 );
     }

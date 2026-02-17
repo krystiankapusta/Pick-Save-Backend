@@ -1,4 +1,4 @@
-package com.picksave.product_service.Controler;
+package com.picksave.product_service.Controller;
 
 import com.picksave.product_service.DataTransferObject.ProductDTO;
 import com.picksave.product_service.Responses.MessageResponse;
@@ -40,7 +40,7 @@ public class ProductController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            logger.error("Error creating product", e);
+            logger.error("Error creating product ", e);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
@@ -54,7 +54,7 @@ public class ProductController {
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
-            logger.error("Error updating product", e);
+            logger.error("Error updating product ", e);
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

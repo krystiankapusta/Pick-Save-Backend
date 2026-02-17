@@ -12,11 +12,11 @@ import com.picksave.auth_service.Responses.MessageResponse;
 import com.picksave.auth_service.Responses.RegisterResponse;
 import com.picksave.auth_service.Service.AuthenticationService;
 import com.picksave.security_common.Service.JwtService;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,6 +39,11 @@ public class AuthenticationController {
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
     }
+    @PostConstruct
+    public void debugInit() {
+        System.out.println("✅ AuthController loaded successfully with path /auth");
+    }
+
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterUserDTO registerUserDTO) {

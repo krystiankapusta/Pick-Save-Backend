@@ -38,7 +38,7 @@ public enum Role {
     public List<SimpleGrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorities = getPermissions()
                 .stream()
-                .map(permission -> new SimpleGrantedAuthority(permission.getPersmission()))
+                .map(permission -> new SimpleGrantedAuthority(permission.getPermission()))
                 .collect(Collectors.toList());
         authorities.add(new SimpleGrantedAuthority("ROLE_" + this.name()));
         return authorities;
